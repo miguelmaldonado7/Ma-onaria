@@ -146,7 +146,7 @@ namespace Maconaria
         }
         void MakeInterface()
         {
-            font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             var canvas = new GameObject("Interface", typeof(Canvas), typeof(CanvasScaler));
             canvas.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
             var scaler = canvas.GetComponent<CanvasScaler>();

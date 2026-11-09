@@ -16,7 +16,13 @@ namespace Maconaria
             if (game == null || !game.Playing) { Body.velocity = Vector3.zero; return; }
             Vector3 direction;
             if (player)
-                direction = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
+            {
+                float horizontal = (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) ? 1 : 0)
+                    - (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) ? 1 : 0);
+                float vertical = (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) ? 1 : 0)
+                    - (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) ? 1 : 0);
+                direction = new Vector3(horizontal, 0, vertical).normalized;
+            }
             else
                 direction = (game.Player.transform.position - transform.position).normalized;
             direction.y = 0;

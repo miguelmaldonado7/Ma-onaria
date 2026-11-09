@@ -11,16 +11,25 @@ public static class PrepareArena
     static PrepareArena() { EditorApplication.delayCall += PrepareIfMissing; }
     static void PrepareIfMissing()
     {
-        if (!Application.isBatchMode && !File.Exists(ScenePath) && !EditorApplication.isPlayingOrWillChangePlaymode) Create();
+        if (Application.isBatchMode || File.Exists(ScenePath) || EditorApplication.isPlayingOrWillChangePlaymode) return;
+        if (EditorApplication.isCompiling || EditorApplication.isUpdating)
+        {
+            EditorApplication.delayCall += PrepareIfMissing;
+            return;
+        }
+        Create();
     }
     [MenuItem("Maçonaria/Preparar cena inicial")]
     public static void Create()
     {
         if (File.Exists(ScenePath))
         {
-            if (!Application.isBatchMode) EditorSceneManager.OpenScene(ScenePath);
+            EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
+            if (!Application.isBatchMode && EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+                EditorSceneManager.OpenScene(ScenePath);
             return;
         }
+        if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
         Directory.CreateDirectory("Assets/Scenes");
         Directory.CreateDirectory("Assets/Prefabs");
         Directory.CreateDirectory("Assets/Materials");
@@ -119,10 +128,16 @@ public static class PrepareArena
     }
     static Material Material(string name, Color color, bool emissive = false)
     {
-        var material = new Material(Shader.Find("Standard"));
+        string path = "Assets/Materials/" + name + ".mat";
+        var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (material == null)
+        {
+            material = new Material(Shader.Find("Standard"));
+            AssetDatabase.CreateAsset(material, path);
+        }
         material.color = color;
         if (emissive) { material.EnableKeyword("_EMISSION"); material.SetColor("_EmissionColor", color * 1.5f); }
-        AssetDatabase.CreateAsset(material, "Assets/Materials/" + name + ".mat");
+        EditorUtility.SetDirty(material);
         return material;
     }
     static GameObject Shape(string name, PrimitiveType type, Vector3 position, Vector3 scale, Material material)
