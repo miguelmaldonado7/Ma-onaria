@@ -1,6 +1,6 @@
 # Validação do protótipo — 09/11/2026
 
-Status: pendente de execução no Unity 2022.3.62f1. Esta lista não representa testes aprovados.
+Status: pendente de execução no Unity 2022.3.62f3. Esta lista não representa testes aprovados.
 
 - [ ] Importar o projeto sem erros no Console.
 - [ ] Confirmar geração da cena, textura, materiais e cinco prefabs.

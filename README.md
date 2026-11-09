@@ -4,7 +4,7 @@ Protótipo de sobrevivência em arena 3D, com ataques automáticos e ambientaç�
 
 ## Abrir
 
-1. Instale o Unity **2022.3.62f1 LTS** pelo Unity Hub, com suporte a Windows Build Support se for gerar o executável Windows.
+1. Instale o Unity **2022.3.62f3 LTS** pelo Unity Hub, com suporte a Windows Build Support se for gerar o executável Windows.
 2. No Hub, escolha **Add project from disk** e selecione esta pasta.
 3. Aguarde a importação e a compilação. A preparação inicial cria a cena `Assets/Scenes/Claustro.unity`, os materiais, a textura de pedra e os prefabs.
 4. Caso a cena não abra automaticamente, use **Maçonaria → Preparar cena inicial**.
