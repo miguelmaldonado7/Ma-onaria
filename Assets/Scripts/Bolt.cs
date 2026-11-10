@@ -5,6 +5,7 @@ namespace Maconaria
     public sealed class Bolt : MonoBehaviour
     {
         public Vector3 direction;
+        public int damage = 1;
         bool spent;
         void Start() { Destroy(gameObject, 3); }
         void FixedUpdate()
@@ -19,7 +20,7 @@ namespace Maconaria
             if (actor != null && actor.player) return;
             if (other.isTrigger) return;
             spent = true;
-            if (actor != null) actor.Hit(1);
+            if (actor != null) actor.Hit(damage);
             Destroy(gameObject);
         }
     }

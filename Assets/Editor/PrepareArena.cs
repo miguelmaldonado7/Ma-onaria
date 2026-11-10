@@ -7,7 +7,7 @@ using Maconaria;
 [InitializeOnLoad]
 public static class PrepareArena
 {
-    const string ScenePath = "Assets/Scenes/Claustro.unity";
+    const string ScenePath = "Assets/Scenes/Catedral.unity";
     static PrepareArena() { EditorApplication.delayCall += PrepareIfMissing; }
     static void PrepareIfMissing()
     {
@@ -54,12 +54,12 @@ public static class PrepareArena
         Object.DestroyImmediate(texture);
         AssetDatabase.ImportAsset("Assets/Textures/Pedra.png");
         stone.mainTexture = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Textures/Pedra.png");
-        stone.mainTextureScale = new Vector2(6, 6);
-        Shape("Piso", PrimitiveType.Cube, new Vector3(0, -.5f, 0), new Vector3(40, 1, 40), stone);
-        Shape("Muro norte", PrimitiveType.Cube, new Vector3(0, 1, 20), new Vector3(42, 2, 1), stone);
-        Shape("Muro sul", PrimitiveType.Cube, new Vector3(0, 1, -20), new Vector3(42, 2, 1), stone);
-        Shape("Muro leste", PrimitiveType.Cube, new Vector3(20, 1, 0), new Vector3(1, 2, 40), stone);
-        Shape("Muro oeste", PrimitiveType.Cube, new Vector3(-20, 1, 0), new Vector3(1, 2, 40), stone);
+        stone.mainTextureScale = new Vector2(18, 18);
+        Shape("Piso", PrimitiveType.Cube, new Vector3(0, -.5f, 0), new Vector3(76, 1, 76), stone);
+        Shape("Muro norte", PrimitiveType.Cube, new Vector3(0, 1, 38), new Vector3(78, 2, 1), stone);
+        Shape("Muro sul", PrimitiveType.Cube, new Vector3(0, 1, -38), new Vector3(78, 2, 1), stone);
+        Shape("Muro leste", PrimitiveType.Cube, new Vector3(38, 1, 0), new Vector3(1, 2, 76), stone);
+        Shape("Muro oeste", PrimitiveType.Cube, new Vector3(-38, 1, 0), new Vector3(1, 2, 76), stone);
         Shape("Altar", PrimitiveType.Cube, new Vector3(0, .75f, 0), new Vector3(3, 1.5f, 2), stone);
         for (int x = -12; x <= 12; x += 8)
         {
@@ -67,6 +67,21 @@ public static class PrepareArena
             Shape("Arco partido", PrimitiveType.Cube, new Vector3(x + 1, 4, 13), new Vector3(3, .5f, 1), stone).transform.rotation = Quaternion.Euler(0, 0, -20);
             Shape("Lápide", PrimitiveType.Cube, new Vector3(x, .65f, -12), new Vector3(1.1f, 1.3f, .5f), stone);
         }
+        for (int side = -1; side <= 1; side += 2)
+        {
+            for (int z = -28; z <= 28; z += 8)
+            {
+                Shape("Coluna do claustro", PrimitiveType.Cylinder, new Vector3(side * 25, 2.4f, z), new Vector3(1.2f, 2.4f, 1.2f), stone);
+                Shape("Capitel", PrimitiveType.Cube, new Vector3(side * 25, 4.8f, z), new Vector3(2,.4f,2), stone);
+                Shape("Sepultura", PrimitiveType.Cube, new Vector3(side * 31,.2f,z), new Vector3(2,.4f,3), stone);
+                Shape("Vela", PrimitiveType.Cylinder, new Vector3(side * 23,.35f,z), new Vector3(.18f,.35f,.18f), bone);
+                Shape("Chama", PrimitiveType.Sphere, new Vector3(side * 23,.8f,z), new Vector3(.12f,.25f,.12f), gold);
+            }
+        }
+        var garden = Material("Musgo", new Color(.14f,.22f,.15f));
+        garden.mainTexture = stone.mainTexture;
+        Shape("Jardim abandonado", PrimitiveType.Cube, new Vector3(-14,-.02f,24), new Vector3(14,.1f,14), garden);
+        Shape("Santuário", PrimitiveType.Cube, new Vector3(10,.25f,26), new Vector3(12,.5f,9), stone);
         var cameraObject = new GameObject("Câmera", typeof(Camera), typeof(AudioListener));
         cameraObject.tag = "MainCamera";
         var camera = cameraObject.GetComponent<Camera>();
@@ -96,7 +111,7 @@ public static class PrepareArena
         fragment.GetComponent<Collider>().isTrigger = true;
         fragment.AddComponent<Fragment>();
         var glow = fragment.AddComponent<Light>();
-        glow.type = LightType.Point; glow.range = 2; glow.intensity = .7f; glow.color = Color.yellow;
+        glow.type = LightType.Point; glow.range = .8f; glow.intensity = .15f; glow.color = Color.yellow;
         var halo = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Particle.mat");
         var haloType = typeof(GameObject).Assembly.GetType("UnityEngine.Halo");
         if (haloType != null)
@@ -104,7 +119,7 @@ public static class PrepareArena
             var component = fragment.AddComponent(haloType);
             var serialized = new SerializedObject(component);
             var size = serialized.FindProperty("m_Size");
-            if (size != null) size.floatValue = 1.8f;
+            if (size != null) size.floatValue = .35f;
             var enabled = serialized.FindProperty("m_Enabled");
             if (enabled != null) enabled.boolValue = true;
             serialized.ApplyModifiedPropertiesWithoutUndo();
@@ -114,9 +129,9 @@ public static class PrepareArena
         var particles = effect.AddComponent<ParticleSystem>();
         particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         var main = particles.main; main.loop = false; main.duration = .5f;
-        main.startLifetime = .7f; main.startSpeed = 3; main.startSize = .18f; main.playOnAwake = false;
+        main.startLifetime = .3f; main.startSpeed = 1; main.startSize = .09f; main.playOnAwake = false;
         var emission = particles.emission; emission.rateOverTime = 0;
-        emission.SetBursts(new[] { new ParticleSystem.Burst(0, 22) });
+        emission.SetBursts(new[] { new ParticleSystem.Burst(0, 6) });
         effect.GetComponent<ParticleSystemRenderer>().sharedMaterial = halo;
         arena.effectPrefab = Save(effect);
         EditorSceneManager.SaveScene(scene, ScenePath);
@@ -161,6 +176,16 @@ public static class PrepareArena
         Object.DestroyImmediate(head.GetComponent<Collider>()); head.transform.SetParent(root.transform, false);
         var relic = Shape("Relicário", PrimitiveType.Cube, new Vector3(0, .2f, .4f), new Vector3(.22f, .3f, .12f), emblem);
         Object.DestroyImmediate(relic.GetComponent<Collider>()); relic.transform.SetParent(root.transform, false);
+        for (int side = -1; side <= 1; side += 2)
+        {
+            var arm = Shape("Manga", PrimitiveType.Capsule, new Vector3(side * .48f, .05f, 0), new Vector3(.22f,.45f,.24f), clothing);
+            Object.DestroyImmediate(arm.GetComponent<Collider>()); arm.transform.SetParent(root.transform, false);
+            var shoulder = Shape("Ombreira", PrimitiveType.Sphere, new Vector3(side * .43f,.48f,0), new Vector3(.35f,.22f,.35f), iron);
+            Object.DestroyImmediate(shoulder.GetComponent<Collider>()); shoulder.transform.SetParent(root.transform, false);
+        }
+        var belt = Shape("Cinto", PrimitiveType.Cube, new Vector3(0,-.25f,0), new Vector3(.85f,.12f,.72f), iron);
+        Object.DestroyImmediate(belt.GetComponent<Collider>()); belt.transform.SetParent(root.transform, false);
+        root.AddComponent<FigureMotion>();
         if (!player) torso.transform.localRotation = Quaternion.Euler(18, 0, 0);
         return Save(root);
     }
