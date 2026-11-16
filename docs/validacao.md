@@ -20,7 +20,9 @@ A versão usa modelos geométricos e não inclui áudio, chefes, escolha de arma
 
 ## Revisão do código antes do teste na faculdade
 
-Corrigidos o módulo de conversão de imagens usado por `EncodeToPNG`, o módulo de renderização de texto e a referência à fonte interna `LegacyRuntime.ttf`. O movimento agora lê WASD e setas diretamente, sem depender dos eixos configurados no Input Manager. A preparação aguarda a importação, reaproveita materiais de uma tentativa interrompida e restaura a inclusão da cena nas configurações de build quando ela já existe.
+Incluído o módulo de conversão de imagens usado por `EncodeToPNG` e corrigida a referência à fonte interna `LegacyRuntime.ttf`. O movimento agora lê WASD e setas diretamente, sem depender dos eixos configurados no Input Manager. A preparação aguarda a importação, reaproveita materiais de uma tentativa interrompida e restaura a inclusão da cena nas configurações de build quando ela já existe.
+
+Em 16/11, o Package Manager no Unity 2022.3.62f3 rejeitou `com.unity.modules.inputlegacy` e `com.unity.modules.textrendering`. As duas entradas foram removidas do manifesto. A resolução dos pacotes e a compilação devem ser conferidas novamente no editor.
 
 Verificação realizada: revisão dos scripts, validação do manifesto JSON e conferência do diff. Compilação, física, efeitos e execução continuam pendentes no Unity. Os logs recebidos do Mac mostram falha de inicialização também em um projeto vazio; essas correções não são apresentadas como solução confirmada para essa falha do editor.
 
