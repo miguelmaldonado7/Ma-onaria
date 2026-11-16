@@ -19,6 +19,8 @@ namespace Maconaria
         public int[] weapons = { 1, 0, 0 };
         bool choosing;
         float incenseAt, bladeAt;
+        float nextPickupEffect;
+        Material ritualMaterial;
         readonly string[] names = { "Relicário", "Incensário", "Lâminas" };
         Text hud, notice, result;
         Image animationImage;
@@ -28,6 +30,7 @@ namespace Maconaria
         void Awake() { Current = this; }
         void Start()
         {
+            ritualMaterial = new Material(Shader.Find("Sprites/Default"));
             Player = Instantiate(playerPrefab, new Vector3(0, 1, -5), Quaternion.identity).GetComponent<Actor>();
             Player.gameObject.AddComponent<WeaponDisplay>();
             view = Camera.main;
@@ -42,6 +45,8 @@ namespace Maconaria
         {
             if (choosing)
             {
+                animationImage.enabled = Time.unscaledTime < animationUntil;
+                if (animationImage.enabled) animationImage.sprite = frames[(int)(Time.unscaledTime * 12) % frames.Length];
                 for (int i = 0; i < 3; i++)
                     if (Input.GetKeyDown((KeyCode)((int)KeyCode.Alpha1 + i)) && weapons[i] < 5)
                     {
@@ -73,7 +78,7 @@ namespace Maconaria
             }
             if (weapons[2] > 0 && Time.time >= bladeAt)
             {
-                bladeAt = Time.time + .45f;
+                bladeAt = Time.time + .5f - weapons[2] * .04f;
                 for (int i = 0; i < 1 + weapons[2] / 2; i++)
                 {
                     float angle = Time.time * 2.6f + i * Mathf.PI * 2 / (1 + weapons[2] / 2);
@@ -84,8 +89,8 @@ namespace Maconaria
                 }
             }
             if (Time.time > noticeUntil) notice.text = "";
-            animationImage.enabled = Time.time < animationUntil;
-            if (animationImage.enabled) animationImage.sprite = frames[(int)(Time.time * 12) % frames.Length];
+            animationImage.enabled = Time.unscaledTime < animationUntil;
+            if (animationImage.enabled) animationImage.sprite = frames[(int)(Time.unscaledTime * 12) % frames.Length];
             Refresh();
         }
         void LateUpdate()
@@ -142,6 +147,7 @@ namespace Maconaria
                 var extra = Instantiate(boltPrefab, Player.transform.position + direction * .8f, Quaternion.identity).GetComponent<Bolt>();
                 extra.direction = Quaternion.Euler(0, weapons[0] == 5 ? 12 : 7, 0) * direction;
                 extra.damage = bolt.damage;
+                if (weapons[0] >= 4) extra.transform.localScale *= 1.4f;
             }
             fireAt = Time.time + Mathf.Max(.4f, 1.1f - weapons[0] * .13f);
         }
@@ -155,15 +161,19 @@ namespace Maconaria
         }
         public void Collect()
         {
-            Ring(Player.transform.position + Vector3.up * .2f, .25f, new Color(.65f,.8f,.7f), .16f);
+            if (Time.unscaledTime >= nextPickupEffect)
+            {
+                nextPickupEffect = Time.unscaledTime + .1f;
+                Ring(Player.transform.position + Vector3.up * .2f, .25f, new Color(.65f,.8f,.7f), .16f);
+            }
             experience++;
             if (experience >= 5)
             {
                 experience -= 5;
                 level++;
-                notice.text = "NÍVEL " + level + " • RELICÁRIO FORTALECIDO";
+                notice.text = "NÍVEL " + level + " • ESCOLHA SUA MELHORIA";
                 noticeUntil = Time.time + 2;
-                animationUntil = Time.time + .55f;
+                animationUntil = Time.unscaledTime + .55f;
                 Ring(Player.transform.position, 1.2f, new Color(.8f,.65f,.3f), .45f);
                 if (Array.Exists(weapons, value => value < 5))
                 {
@@ -197,7 +207,7 @@ namespace Maconaria
         {
             var obj = new GameObject("Ritual");
             var line = obj.AddComponent<LineRenderer>();
-            line.sharedMaterial = fragmentPrefab.GetComponent<Renderer>().sharedMaterial;
+            line.sharedMaterial = ritualMaterial;
             line.startColor = line.endColor = color;
             line.startWidth = line.endWidth = .035f;
             line.positionCount = 33;
@@ -206,7 +216,7 @@ namespace Maconaria
                 float a = i * Mathf.PI * 2 / 32;
                 line.SetPosition(i, position + new Vector3(Mathf.Cos(a) * radius, -.5f, Mathf.Sin(a) * radius));
             }
-            Destroy(obj, duration);
+            obj.AddComponent<RitualFade>().duration = duration;
         }
         public void Refresh() { Changed?.Invoke(); }
         void RenderHud()
@@ -263,6 +273,7 @@ namespace Maconaria
         void OnDestroy()
         {
             Time.timeScale = 1;
+            if (ritualMaterial != null) Destroy(ritualMaterial);
             Changed -= RenderHud;
             if (frames != null) foreach (var frame in frames) { Destroy(frame.texture); Destroy(frame); }
             if (Current == this) Current = null;

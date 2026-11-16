@@ -18,7 +18,7 @@ namespace Maconaria
             if (!Arena.Current.Playing) return;
             float swing = actor.Body.velocity.sqrMagnitude > .1f ? Mathf.Sin(Time.time * 8) * 12 : 0;
             for (int i = 0; i < parts.Length; i++)
-                if (parts[i].name == "Manga") parts[i].localRotation = rest[i] * Quaternion.Euler(swing * (i % 2 == 0 ? 1 : -1), 0, 0);
+                if (parts[i].name == "Manga") parts[i].localRotation = rest[i] * Quaternion.Euler(swing * (parts[i].localPosition.x > 0 ? 1 : -1), 0, 0);
         }
     }
 }

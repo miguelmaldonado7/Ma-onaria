@@ -6,7 +6,7 @@ namespace Maconaria
     {
         bool collected;
         void Update() { if (Arena.Current.Playing) transform.Rotate(0, 70 * Time.deltaTime, 0); }
-        void OnTriggerEnter(Collider other)
+        void OnTriggerStay(Collider other)
         {
             var actor = other.GetComponent<Actor>();
             if (collected || !Arena.Current.Playing || actor == null || !actor.player) return;

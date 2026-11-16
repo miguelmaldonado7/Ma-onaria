@@ -24,6 +24,8 @@ public static class PrepareArena
     {
         if (File.Exists(ScenePath))
         {
+            PresentationMaterials.Refresh();
+        RitualModels.UpdateModels();
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
             if (!Application.isBatchMode && EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
                 EditorSceneManager.OpenScene(ScenePath);
@@ -140,6 +142,8 @@ public static class PrepareArena
         PlayerSettings.companyName = "Miguel e Daniel";
         PlayerSettings.defaultScreenWidth = 1280; PlayerSettings.defaultScreenHeight = 720;
         AssetDatabase.SaveAssets();
+        PresentationMaterials.Refresh();
+        RitualModels.UpdateModels();
     }
     static Material Material(string name, Color color, bool emissive = false)
     {

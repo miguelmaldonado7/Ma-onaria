@@ -3,9 +3,17 @@ namespace Maconaria
 {
     public sealed class WeaponDisplay : MonoBehaviour
     {
+        GameObject censer;
         readonly GameObject[] blades = new GameObject[3];
         void Start()
         {
+            censer = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            censer.name = "Incensário";
+            Destroy(censer.GetComponent<Collider>());
+            censer.GetComponent<Renderer>().sharedMaterial = Arena.Current.boltPrefab.GetComponent<Renderer>().sharedMaterial;
+            censer.transform.SetParent(transform, false);
+            censer.transform.localPosition = new Vector3(-.65f, -.25f, .3f);
+            censer.transform.localScale = new Vector3(.3f,.45f,.3f);
             for (int i = 0; i < blades.Length; i++)
             {
                 blades[i] = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -17,6 +25,10 @@ namespace Maconaria
         }
         void Update()
         {
+            if (Arena.Current == null || !Arena.Current.Playing) return;
+            censer.SetActive(Arena.Current.weapons[1] > 0);
+            censer.transform.localPosition = new Vector3(-.65f, -.25f, .3f + Mathf.Sin(Time.time * 3) * .15f);
+            censer.transform.localScale = new Vector3(.3f,.45f,.3f) * (Arena.Current.weapons[1] >= 4 ? 1.3f : 1);
             int level = Arena.Current.weapons[2];
             for (int i = 0; i < blades.Length; i++)
             {
